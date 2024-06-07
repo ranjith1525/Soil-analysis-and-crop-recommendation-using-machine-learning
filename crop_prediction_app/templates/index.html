@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Crop Prediction</title>
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        /* Custom styles */
+        body {
+            background-color: #f8f9fa;
+            font-family: Arial, sans-serif;
+        }
+
+        .navbar-brand {
+            color: #155724; /* Dark green */
+            font-weight: bold;
+        }
+
+        .navbar-nav .nav-link {
+            color: #155724; /* Dark green */
+        }
+
+        .navbar-nav .nav-link:hover {
+            color: #4CAF50; /* Light green on hover */
+        }
+
+        .card {
+            border: none;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .card-header {
+            background-color: #d4edda; /* Light green */
+            color: #155724; /* Dark green */
+            font-weight: bold;
+        }
+
+        .btn-primary {
+            background-color: #155724; /* Dark green */
+            border: none;
+        }
+
+        .btn-primary:hover {
+            background-color: #4CAF50; /* Light green on hover */
+        }
+
+        .footer {
+            background-color: #d4edda; /* Light green */
+            color: #155724; /* Dark green */
+        }
+
+        .error-message {
+            color: red;
+        }
+
+        /* Animations */
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .animated {
+            animation-duration: 0.5s;
+            animation-fill-mode: both;
+        }
+
+        .fadeInUp {
+            animation-name: fadeInUp;
+        }
+
+        /* Feedback form styles */
+        .feedback-form {
+            display: none;
+            background-color: #ffffff;
+            padding: 20px;
+            border-radius: 5px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .feedback-form .form-group label {
+            font-weight: bold;
+            color: #155724; /* Dark green */
+        }
+
+        .feedback-form .form-group textarea {
+            resize: none;
+            height: 100px;
+        }
+
+        .feedback-form .btn-primary {
+            margin-top: 10px;
+        }
+    </style>
+</head>
+<body>
+
+<nav class="navbar navbar-expand-lg navbar-light bg-light">
+    <a class="navbar-brand" href="#">Crop Prediction</a>
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarNav">
+        <ul class="navbar-nav ml-auto">
+            <li class="nav-item">
+                <a class="nav-link" href="#">Home</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="#">About</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="#" id="feedbackBtn">Feedback</a>
+            </li>
+        </ul>
+    </div>
+</nav>
+
+<div class="container mt-5 animated fadeInUp">
+    <div class="row">
+        <div class="col-md-6 offset-md-3">
+            <div class="card">
+                <div class="card-header">
+                    Crop Prediction
+                </div>
+                <div class="card-body">
+                    <form id="predictionForm" action="/predict" method="post">
+                        <div class="form-group">
+                            <label for="N">N (Nitrogen):</label>
+                            <input type="text" class="form-control" id="N" name="N">
+                        </div>
+                        <div class="form-group">
+                            <label for="P">P (Phosphorus):</label>
+                            <input type="text" class="form-control" id="P" name="P">
+                        </div>
+                        <div class="form-group">
+                            <label for="K">K (Potassium):</label>
+                            <input type="text" class="form-control" id="K" name="K">
+                        </div>
+                        <div class="form-group">
+                            <label for="temperature">Temperature:</label>
+                            <input type="text" class="form-control" id="temperature" name="temperature">
+                        </div>
+                        <div class="form-group">
+                            <label for="humidity">Humidity:</label>
+                            <input type="text" class="form-control" id="humidity" name="humidity">
+                        </div>
+                        <div class="form-group">
+                            <label for="ph">pH:</label>
+                            <input type="text" class="form-control" id="ph" name="ph">
+                        </div>
+                        <div class="form-group">
+                            <label for="rainfall">Rainfall:</label>
+                            <input type="text" class="form-control" id="rainfall" name="rainfall">
+                        </div>
+                        <button type="submit" class="btn btn-primary">Predict</button>
+                    </form>
+                    {% if prediction %}
+                    <div class="mt-4">
+                        <h5 class="text-center">Predicted Crop:</h5>
+                        <p class="text-center">{{ prediction }}</p>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<footer class="footer mt-5 py-3 animated fadeInUp">
+    <div class="container">
+        <div class="row">
+            <div class="col-md-6">
+                <p class="text-muted mb-0">Developed by: Ajay Kumar Dasa, Ranjith Kumar S, and Sathish Kumar</p>
+            </div>
+            <div class="col-md-6">
+                <p class="text-muted mb-0 text-md-right">Need help? <a href="#">Contact Us</a></p>
+            </div>
+        </div>
+    </div>
+</footer>
+
+<div class="container mt-5 feedback-form animated fadeInUp" id="feedbackForm">
+    <div class="card">
+        <div class="card-header">
+            Feedback Form
+        </div>
+        <div class="card-body">
+            <form action="/feedback" method="post">
+                <div class="form-group">
+                    <label for="message">Your Message:</label>
+                    <textarea class="form-control" id="message" name="message" rows="5"></textarea>
+                </div>
+                <button type="submit" class="btn btn-primary">Submit</button>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.3/dist/umd/popper.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+<script>
+    // Client-side validation
+    document.getElementById("predictionForm").addEventListener("submit", function(event) {
+        var isValid = true;
+        var inputs = this.elements;
+        for (var i = 0; i < inputs.length; i++) {
+            if (inputs[i].type === "text" && parseFloat(inputs[i].value) === 0) {
+                isValid = false;
+                inputs[i].classList.add("is-invalid");
+                var errorMessage = document.createElement("div");
+                errorMessage.classList.add("error-message");
+                errorMessage.textContent = "Invalid entry. Please enter a non-zero value.";
+                inputs[i].parentNode.appendChild(errorMessage);
+            }
+        }
+        if (!isValid) {
+            event.preventDefault();
+        }
+    })
+
+    // Show/hide feedback form
+    document.getElementById("feedbackBtn").addEventListener("click", function(event) {
+        event.preventDefault();
+        var feedbackForm = document.getElementById("feedbackForm");
+        if (feedbackForm.style.display === "none") {
+            feedbackForm.style.display = "block";
+        } else {
+            feedbackForm.style.display = "none";
+        }
+    });
+</script>
+
+</body>
+</html>
